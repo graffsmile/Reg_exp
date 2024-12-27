@@ -1,3 +1,4 @@
+import os
 from os.path import split
 from pprint import pprint
 import csv
@@ -38,19 +39,36 @@ def split_name(file_name):
     return contacts_dict
 
 
+def phones_fixed(file_name, n_file):
+    with open(file_name, encoding="utf-8") as f:
+        text = f.read()
+
+    pattern = r'(\+7|8)?\s*\(?(\d{3})\)?[\s*-]?(\d{3})[\s*-]?(\d{2})[\s*-]?(\d{2})(\s*)\(?(доб\.?)?\s*(\d*)?\)?'
+    fixed_phones = re.sub(pattern, r'+7(\2)\3-\4-\5\6\7\8', text)
+    with open(n_file, 'w+', encoding="utf-8") as fw:
+        fix = fw.write(fixed_phones)
+    return fix
+
 
   # TODO 2: сохраните получившиеся данные в другой файл
   # код для записи файла в формате CSV
-def write(new_file):
-    contacts = split_name(file_name)
+def write(new_file, dict):
+    # contacts = splited_name
+    keys = list(dict[0].keys())
     with open(new_file, "w", encoding="utf-8") as f:
         datawriter = csv.writer(f, delimiter=',')
     # Вместо contacts_list подставьте свой список
-        datawriter.writerows(contacts)
+        datawriter.writerows(keys)
+        for items in dict:
+            datawriter.writerows(items)
         # return datawriter.writerows(contacts)
 
 if __name__ == '__main__':
     file_name = 'phonebook_raw.csv'
     new_file = 'phonebook.csv'
-    pprint(split_name(file_name))
-    # write(new_file)
+
+    phones_fixed(file_name, n_file='nfile.csv')
+    splited_name = split_name(file_name='nfile.csv')
+    os.remove('nfile.csv')
+    pprint(splited_name)
+    write(new_file, splited_name)
